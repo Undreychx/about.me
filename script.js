@@ -24,7 +24,7 @@ document.addEventListener('pointerdown', e => {
   r.style.width = r.style.height = '150px';
   document.body.appendChild(r);
   setTimeout(() => r.remove(), 700);
-  if (e.target.closest('a,button,.card,.pill,.contact-row,.stat,.q')) playPop();
+  if (e.target.closest('a,button,.card.link,.card.popup,.pill,.contact-row,.q')) playPop();
 });
 
 // звёздное небо
@@ -110,7 +110,10 @@ document.querySelectorAll('a[href]').forEach(a => {
 const io = new IntersectionObserver(es => es.forEach(e => {
   if (e.isIntersecting) {
     e.target.classList.add('in');
+    const t = e.target;
+    setTimeout(() => { t.classList.remove('reveal', 'in'); t.style.transitionDelay = ''; }, 1000);
     io.unobserve(e.target);
+    setTimeout(() => { e.target.classList.add('done'); e.target.style.transitionDelay = ''; }, 1100);
     e.target.querySelectorAll('[data-n]').forEach(count);
   }
 }), { threshold: .15 });
@@ -129,7 +132,7 @@ function count(el) {
 }
 
 // подсветка и наклон карточек
-document.querySelectorAll('.card').forEach(c => {
+document.querySelectorAll('.card.link,.card.popup').forEach(c => {
   c.addEventListener('mousemove', e => {
     const b = c.getBoundingClientRect();
     const x = e.clientX - b.left, y = e.clientY - b.top;
@@ -213,3 +216,8 @@ document.querySelectorAll('[data-copy]').forEach(c => c.addEventListener('click'
   navigator.clipboard && navigator.clipboard.writeText(c.dataset.copy);
   say('Скопировано: ' + c.dataset.copy);
 }));
+
+// возврат на страницу кнопкой «назад»
+addEventListener('pageshow', e => {
+  if (e.persisted) document.body.classList.remove('leave');
+});
