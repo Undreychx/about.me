@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Портфолио — Unchx</title>
+<meta name="description" content="Unchx — разработка сайтов вручную на HTML5. Андрей Чабан, Брест.">
+<meta name="theme-color" content="#05030b">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="stars"></canvas><div class="nebula"></div><div id="cursor"></div><div class="prog"></div>
+<header><div class="wrap bar">
+<a href="index.html" class="logo"><i></i><b>Unchx</b></a>
+<nav><a href="index.html" class="">Главная</a><a href="services.html" class="">Услуги</a><a href="portfolio.html" class="on">Портфолио</a><a href="about.html" class="">Обо мне</a><a href="contact.html" class="">Контакты</a></nav>
+<button class="btn" data-order="">Заказать сайт</button>
+<button class="burger" aria-label="Меню">☰</button>
+</div></header>
+<main class="wrap"><div class="page-head"><span class="tag">Портфолио</span><h1 style="font-size:clamp(34px,5vw,56px)">Примеры <em>работ</em></h1></div>
+<section style="padding-top:20px"><div class="two">
+<div class="card reveal" style="cursor:default"><div class="ico">🏫</div><h3>Информационный сайт СШ №11 г. Бреста</h3><p>Многостраничный проект, полностью написанный вручную. Структурирует большой объём информации и содержит удобные навигационные меню.</p><br><a class="btn" href="https://github.io" target="_blank" rel="noopener">Посмотреть вживую ↗</a></div>
+<div class="card reveal" style="cursor:default"><h3>Что внутри проекта</h3><ul class="list"><li>Много разделов и страниц</li><li>Понятная навигация</li><li>Код без конструкторов</li></ul></div>
+</div></section></main>
+<footer><div class="wrap fl">
+<div><b style="color:#fff">Unchx</b> · Чабан Андрей, Брест, Беларусь<br>© 2026 Все права защищены</div>
+<nav><a href="index.html" class="">Главная</a><a href="services.html" class="">Услуги</a><a href="portfolio.html" class="on">Портфолио</a><a href="about.html" class="">Обо мне</a><a href="contact.html" class="">Контакты</a></nav>
+</div></footer>
+<div class="modal" id="order"><div class="win">
+<button class="x">✕</button>
+<h3>Заказать сайт</h3><p class="sub">Заполните — и откроется чат со мной в Telegram.</p>
+<label>Что нужно сделать</label>
+<select id="kind"><option>Мультиссылка / визитка</option><option>Многостраничный сайт</option><option>Медиакит / прайс-лист</option><option>Промо-страница (Landing Page)</option><option>Другое</option></select>
+<label>Ваше имя</label><input id="nm" placeholder="Как к вам обращаться">
+<label>Коротко о задаче</label><textarea id="msg" placeholder="Расскажите о проекте и сроках"></textarea>
+<button class="btn" id="send" style="width:100%;margin-top:20px">Отправить в Telegram</button>
+</div></div>
+<div id="toast"></div>
+<button class="top" aria-label="Наверх">↑</button>
+<script src="script.js"></script>
+</body>
+</html>
