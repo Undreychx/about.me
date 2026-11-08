@@ -13,13 +13,15 @@
 <header><div class="wrap bar">
 <a href="index.html" class="logo"><i></i><b>Unchx</b></a>
 <nav><a href="index.html" class="">Главная</a><a href="services.html" class="">Услуги</a><a href="portfolio.html" class="on">Портфолио</a><a href="about.html" class="">Обо мне</a><a href="contact.html" class="">Контакты</a></nav>
+<button class="sbtn" data-search aria-label="Поиск по сайту" title="Поиск (клавиша /)">⌕</button>
+<button class="sbtn" id="snd" aria-label="Звук" title="Звук кликов">🔊</button>
 <button class="btn pop" data-order="">Заказать сайт</button>
 <button class="burger" aria-label="Меню">☰</button>
 </div></header>
 <main class="wrap"><div class="page-head"><span class="tag">Портфолио</span><h1 style="font-size:clamp(34px,5vw,56px)">Примеры <em>работ</em></h1></div>
 <section style="padding-top:20px"><div class="two">
-<div class="card info reveal"><div class="ico">🏫</div><h3>Информационный сайт СШ №11 г. Бреста</h3><p>Многостраничный проект, полностью написанный вручную. Структурирует большой объём информации и содержит удобные навигационные меню.</p><br><a class="btn" href="https://undreychx.github.io/school11/" target="_blank" rel="noopener">Посмотреть вживую ↗</a></div>
-<div class="card info reveal"><h3>Что внутри проекта</h3><ul class="list"><li>Много разделов и страниц</li><li>Понятная навигация</li><li>Код без конструкторов</li></ul></div>
+<div class="card info reveal ad"><span class="ribbon">реклама*</span><img class="shot" src="img/mebel.jpg" alt="Сайт «Мебель под заказ»" loading="lazy"><h3>Мебель под заказ — Брест</h3><p>Многостраничный каталог мебельной мастерской: кухни, шкафы и другая мебель с ценами, страница «Как заказать» и контакты. Написан вручную на HTML5, CSS и JavaScript, без конструкторов.</p><br><a class="btn" href="https://undreychx.github.io/Mebel-pod-zakaz/" target="_blank" rel="noopener">Посмотреть вживую ↗</a><p class="foot">*Да, это реклама. Я сам сделал этот сайт, сам же его тут и рекламирую. Но мебель на нём настоящая, цены тоже 😄</p></div>
+<div class="card info reveal"><h3>Что внутри проекта</h3><ul class="list"><li>6 страниц: кухни, шкафы, другая мебель, проекты, как заказать, контакты</li><li>Таблицы цен по материалам и видам изделий</li><li>Понятная навигация и шаги заказа</li><li>Код без конструкторов</li></ul></div>
 </div></section></main>
 <footer><div class="wrap fl">
 <div><b style="color:#fff">Unchx</b> · Чабан Андрей, Брест, Беларусь<br>© 2026 Все права защищены</div>
@@ -33,6 +35,12 @@
 <label>Ваше имя</label><input id="nm" placeholder="Как к вам обращаться">
 <label>Коротко о задаче</label><textarea id="msg" placeholder="Расскажите о проекте и сроках"></textarea>
 <button class="btn" id="send" style="width:100%;margin-top:20px">Отправить в Telegram</button>
+</div></div>
+<div class="modal" id="find"><div class="win">
+<div class="wbar"><span></span><span></span><span></span><em>окно поиска · страница под ним остаётся на месте</em><button class="x" aria-label="Закрыть">✕</button></div>
+<input id="fq" placeholder="Например: цена, telegram, мультиссылка" autocomplete="off">
+<ul class="res" id="fres"></ul>
+<p class="hint">↑ ↓ — выбор · Enter — открыть · Esc — закрыть</p>
 </div></div>
 <div id="toast"></div>
 <button class="top" aria-label="Наверх">↑</button>

@@ -13,6 +13,8 @@
 <header><div class="wrap bar">
 <a href="index.html" class="logo"><i></i><b>Unchx</b></a>
 <nav><a href="index.html" class="">Главная</a><a href="services.html" class="">Услуги</a><a href="portfolio.html" class="">Портфолио</a><a href="about.html" class="on">Обо мне</a><a href="contact.html" class="">Контакты</a></nav>
+<button class="sbtn" data-search aria-label="Поиск по сайту" title="Поиск (клавиша /)">⌕</button>
+<button class="sbtn" id="snd" aria-label="Звук" title="Звук кликов">🔊</button>
 <button class="btn pop" data-order="">Заказать сайт</button>
 <button class="burger" aria-label="Меню">☰</button>
 </div></header>
@@ -33,6 +35,12 @@
 <label>Ваше имя</label><input id="nm" placeholder="Как к вам обращаться">
 <label>Коротко о задаче</label><textarea id="msg" placeholder="Расскажите о проекте и сроках"></textarea>
 <button class="btn" id="send" style="width:100%;margin-top:20px">Отправить в Telegram</button>
+</div></div>
+<div class="modal" id="find"><div class="win">
+<div class="wbar"><span></span><span></span><span></span><em>окно поиска · страница под ним остаётся на месте</em><button class="x" aria-label="Закрыть">✕</button></div>
+<input id="fq" placeholder="Например: цена, telegram, мультиссылка" autocomplete="off">
+<ul class="res" id="fres"></ul>
+<p class="hint">↑ ↓ — выбор · Enter — открыть · Esc — закрыть</p>
 </div></div>
 <div id="toast"></div>
 <button class="top" aria-label="Наверх">↑</button>

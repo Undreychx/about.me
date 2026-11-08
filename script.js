@@ -6,7 +6,10 @@ const sounds = ['pop1', 'pop2', 'pop3', 'pop4'].map(n => {
   return a;
 });
 let last = -1;
+let muted = false;
+try { muted = localStorage.getItem('muted') === '1'; } catch (e) {}
 function playPop() {
+  if (muted) return;
   let i;
   do { i = Math.floor(Math.random() * sounds.length); } while (i === last);
   last = i;
@@ -189,8 +192,17 @@ document.querySelectorAll('[data-order]').forEach(b => b.addEventListener('click
 modal.addEventListener('click', e => {
   if (e.target === modal || e.target.closest('.x')) modal.classList.remove('show');
 });
-addEventListener('keydown', e => e.key === 'Escape' && modal.classList.remove('show'));
+const nmField = document.getElementById('nm');
+try { nmField.value = localStorage.getItem('name') || ''; } catch (e) {}
 document.getElementById('send').onclick = () => {
+  const msgField = document.getElementById('msg');
+  let ok = true;
+  [nmField, msgField].forEach(f => {
+    f.classList.remove('bad');
+    if (f.value.trim().length < 2) { void f.offsetWidth; f.classList.add('bad'); ok = false; }
+  });
+  if (!ok) return say('Заполните имя и коротко опишите задачу');
+  try { localStorage.setItem('name', nmField.value.trim()); } catch (e) {}
   const text = `Здравствуйте! Хочу заказать: ${document.getElementById('kind').value}.\nМеня зовут ${document.getElementById('nm').value || '—'}.\n${document.getElementById('msg').value}`;
   window.open('https://t.me/chandreybrest?text=' + encodeURIComponent(text), '_blank');
   modal.classList.remove('show');
@@ -198,16 +210,187 @@ document.getElementById('send').onclick = () => {
 };
 
 // поиск в шапке главной
-const sf = document.getElementById('sf');
-if (sf) sf.onsubmit = e => {
-  e.preventDefault();
-  const v = document.getElementById('sq').value.toLowerCase();
-  const map = { мульти: 'services.html', визит: 'services.html', лендинг: 'services.html', промо: 'services.html', медиа: 'services.html', прайс: 'services.html', портф: 'portfolio.html', контакт: 'contact.html' };
-  const k = Object.keys(map).find(k => v.includes(k));
-  say(k ? 'Нашёл! Перехожу…' : 'Открываю все услуги…');
+// ---- поиск по сайту ----
+const INDEX = [
+  { i: '🏠', t: 'Главная', d: 'Начало сайта Unchx', u: 'index.html', k: 'главная домой старт' },
+  { i: '💼', t: 'Услуги и цены', d: 'Все типы сайтов и стоимость', u: 'services.html', k: 'услуги цены стоимость прайс сколько стоит' },
+  { i: '🖼️', t: 'Портфолио', d: 'Примеры моих работ', u: 'portfolio.html', k: 'портфолио работы примеры проекты' },
+  { i: '👤', t: 'Обо мне', d: 'Чабан Андрей, веб-программист из Бреста', u: 'about.html', k: 'обо мне андрей чабан разработчик брест html5 github' },
+  { i: '📞', t: 'Контакты', d: 'Telegram, телефон, email', u: 'contact.html', k: 'контакты связаться написать позвонить' },
+  { i: '🔗', t: 'Мультиссылки и визитки', d: 'Все соцсети на одной странице · от 70 BYN', u: 'services.html', k: 'мультиссылка визитка соцсети youtube instagram telegram 70 byn цена' },
+  { i: '🚀', t: 'Промо-страницы (Landing Page)', d: 'Под запуск курсов, гайдов, мерча · от 100 BYN', u: 'services.html', k: 'промо лендинг landing курс гайд мерч реклама инфопродукт 100 byn цена' },
+  { i: '📚', t: 'Многостраничные сайты', d: 'Разделы, меню, статьи · от 200 BYN', u: 'services.html', k: 'многостраничный сайт разделы меню статьи каталог 200 byn цена' },
+  { i: '📊', t: 'Медиакиты и прайс-листы', d: 'Для рекламодателей · от 90 BYN', u: 'services.html', k: 'медиакит прайс блог статистика рекламодатель интеграции 90 byn цена' },
+  { i: '🪑', t: 'Мебель под заказ (реклама)', d: 'Многостраничный каталог мебельной мастерской', u: 'portfolio.html', k: 'мебель кухни шкафы портфолио пример реклама мастерская' },
+  { i: '✈️', t: 'Telegram @chandreybrest', d: 'Написать мне в Telegram', u: 'https://t.me/chandreybrest', k: 'telegram телеграм тг чат написать' },
+  { i: '📱', t: 'Телефон +375 29 784 26 14', d: 'Позвонить', u: 'tel:+375297842614', k: 'телефон номер позвонить звонок' },
+  { i: '✉️', t: 'Email ch.and_rey@icloud.com', d: 'Написать на почту', u: 'mailto:ch.and_rey@icloud.com', k: 'email почта mail письмо' },
+  { i: '🆓', t: 'Хостинг бесплатно', d: 'Размещаю на GitHub Pages без ежемесячной платы', u: 'index.html#faq', k: 'хостинг бесплатно github pages платить' },
+  { i: '⚡', t: 'Скорость и работа на телефоне', d: 'Чистый HTML5, быстро на любых устройствах', u: 'index.html#faq', k: 'быстро скорость телефон мобильный адаптив' },
+  { i: '⏱️', t: 'Сроки и дедлайны', d: 'Сроки обсуждаем заранее и строго соблюдаем', u: 'index.html#faq', k: 'срок сроки быстро дедлайн готово' },
+  { i: '📝', t: 'Заказать сайт', d: 'Откроется окно заказа', u: '#order', k: 'заказать заказ оформить купить сделать' }
+];
+const norm = s => s.toLowerCase().replace(/ё/g, 'е');
+function find(q) {
+  const words = norm(q).split(/\s+/).filter(Boolean).map(w => w.length > 4 ? w.slice(0, -2) : w);
+  if (!words.length) return [];
+  return INDEX.map(it => {
+    const t = norm(it.t), d = norm(it.d), k = norm(it.k);
+    let score = 0;
+    for (const w of words) {
+      const s = (t.includes(w) ? 3 : 0) + (k.includes(w) ? 2 : 0) + (d.includes(w) ? 1 : 0);
+      if (!s) return null;
+      score += s;
+    }
+    return { it, score };
+  }).filter(Boolean).sort((a, b) => b.score - a.score).map(r => r.it);
+}
+function go(u) {
+  if (u === '#order') { closeAll(); return openOrder(); }
+  if (/^(https?:|tel:|mailto:)/.test(u)) return window.open(u, '_blank');
   document.body.classList.add('leave');
-  setTimeout(() => location.href = k ? map[k] : 'services.html', 700);
+  setTimeout(() => location.href = u, 340);
+}
+function renderRes(ul, items, q) {
+  ul.innerHTML = '';
+  if (!items.length) {
+    const li = document.createElement('li');
+    li.className = 'empty';
+    li.textContent = q ? 'Ничего не нашёл. Попробуйте: цена, telegram, сайт' : 'Начните вводить запрос';
+    ul.appendChild(li);
+    return;
+  }
+  const w = norm(q).split(/\s+/).filter(Boolean)[0] || '';
+  items.slice(0, 8).forEach((it, n) => {
+    const li = document.createElement('li');
+    if (n === 0) li.className = 'sel';
+    const box = document.createElement('div');
+    const b = document.createElement('b');
+    const at = norm(it.t).indexOf(w.length > 4 ? w.slice(0, -2) : w);
+    if (w && at >= 0) {
+      const len = w.length > 4 ? w.length - 2 : w.length;
+      b.append(it.t.slice(0, at));
+      const m = document.createElement('mark');
+      m.textContent = it.t.slice(at, at + len);
+      b.append(m, it.t.slice(at + len));
+    } else b.textContent = it.t;
+    const sm = document.createElement('small');
+    sm.textContent = it.d;
+    box.append(b, sm);
+    const ic = document.createElement('span');
+    ic.textContent = it.i;
+    const ar = document.createElement('span');
+    ar.className = 'go';
+    ar.textContent = it.u === '#order' ? '⧉' : '→';
+    li.append(ic, box, ar);
+    li.onclick = () => go(it.u);
+    li.dataset.u = it.u;
+    ul.appendChild(li);
+  });
+}
+function moveSel(ul, dir) {
+  const lis = [...ul.querySelectorAll('li:not(.empty)')];
+  if (!lis.length) return;
+  let n = lis.findIndex(l => l.classList.contains('sel'));
+  lis.forEach(l => l.classList.remove('sel'));
+  n = (n + dir + lis.length) % lis.length;
+  lis[n].classList.add('sel');
+  lis[n].scrollIntoView({ block: 'nearest' });
+}
+function pick(ul) {
+  const s = ul.querySelector('li.sel:not(.empty)');
+  if (s) go(s.dataset.u);
+  return !!s;
+}
+
+// окно поиска
+const finder = document.getElementById('find');
+const fq = document.getElementById('fq');
+const fres = document.getElementById('fres');
+function openFind() {
+  finder.classList.add('show');
+  fq.value = '';
+  renderRes(fres, INDEX.slice(0, 5), '');
+  setTimeout(() => fq.focus(), 50);
+}
+function closeAll() {
+  modal.classList.remove('show');
+  finder.classList.remove('show');
+}
+document.querySelectorAll('[data-search]').forEach(b => b.onclick = openFind);
+finder.addEventListener('click', e => {
+  if (e.target === finder || e.target.closest('.x')) finder.classList.remove('show');
+});
+fq.addEventListener('input', () => renderRes(fres, fq.value.trim() ? find(fq.value) : INDEX.slice(0, 5), fq.value.trim()));
+fq.addEventListener('keydown', e => {
+  if (e.key === 'ArrowDown') { e.preventDefault(); moveSel(fres, 1); }
+  if (e.key === 'ArrowUp') { e.preventDefault(); moveSel(fres, -1); }
+  if (e.key === 'Enter') pick(fres);
+});
+addEventListener('keydown', e => {
+  const typing = /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName);
+  if ((e.key === '/' && !typing) || (e.key.toLowerCase() === 'k' && (e.ctrlKey || e.metaKey))) {
+    e.preventDefault();
+    openFind();
+  }
+  if (e.key === 'Escape') closeAll();
+});
+
+// поиск на главной
+const sf = document.getElementById('sf');
+if (sf) {
+  const sq = document.getElementById('sq');
+  const box = document.createElement('div');
+  box.className = 'sres';
+  const ul = document.createElement('ul');
+  ul.className = 'res';
+  box.appendChild(ul);
+  sf.appendChild(box);
+  sq.addEventListener('input', () => {
+    const q = sq.value.trim();
+    box.classList.toggle('show', !!q);
+    if (q) renderRes(ul, find(q), q);
+  });
+  sq.addEventListener('keydown', e => {
+    if (e.key === 'ArrowDown') { e.preventDefault(); moveSel(ul, 1); }
+    if (e.key === 'ArrowUp') { e.preventDefault(); moveSel(ul, -1); }
+  });
+  document.addEventListener('click', e => { if (!sf.contains(e.target)) box.classList.remove('show'); });
+  sf.onsubmit = e => {
+    e.preventDefault();
+    if (!sq.value.trim()) return say('Введите, что ищете');
+    if (!pick(ul)) say('Ничего не нашёл, попробуйте другое слово');
+  };
+}
+
+// переключатель звука
+const snd = document.getElementById('snd');
+function drawSnd() {
+  snd.textContent = muted ? '🔇' : '🔊';
+  snd.classList.toggle('off', muted);
+}
+drawSnd();
+snd.onclick = () => {
+  muted = !muted;
+  try { localStorage.setItem('muted', muted ? '1' : '0'); } catch (e) {}
+  drawSnd();
+  say(muted ? 'Звук кликов выключен' : 'Звук кликов включён');
+  if (!muted) playPop();
 };
+
+// сортировка услуг по цене
+const svc = document.getElementById('svc');
+if (svc) {
+  const cards = [...svc.children];
+  document.querySelectorAll('[data-sort]').forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll('[data-sort]').forEach(x => x.classList.remove('on'));
+    b.classList.add('on');
+    const m = b.dataset.sort;
+    const list = m === '0' ? cards : [...cards].sort((a, c) => (m === 'asc' ? 1 : -1) * (a.dataset.price - c.dataset.price));
+    list.forEach(c => svc.appendChild(c));
+  }));
+}
+
 document.querySelectorAll('.pill[data-go]').forEach(p => p.onclick = () => {
   document.body.classList.add('leave');
   setTimeout(() => location.href = p.dataset.go, 340);
